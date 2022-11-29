@@ -81,3 +81,17 @@ export const confirmAccount = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const allUsers = async (req: Request, res: Response) => {
+  try {
+    const user = await User.find();
+    if (!(user.length !== 0))
+      throw new Error(`No tenemos usuarios registrados❌`);
+    return res.status(200).json(user);
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      error: error.message,
+    });
+  }
+};
