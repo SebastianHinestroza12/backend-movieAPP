@@ -1,6 +1,6 @@
 import express from "express";
 import morgan from "morgan";
-import { router } from "./Routes/index";
+import { router } from "./Routes/index.routes";
 import session from "express-session";
 import cors from "cors";
 import "./Database/db";
