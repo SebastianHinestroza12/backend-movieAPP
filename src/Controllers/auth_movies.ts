@@ -1,0 +1,207 @@
+import { validationResult } from "express-validator";
+import { Response, Request } from "express";
+import Movie from "../Model/Movie";
+
+export const getAllMovies = async (req: Request, res: Response) => {
+  try {
+    const allMovie = await Movie.find();
+    if (allMovie.length > 0) return res.status(200).json(allMovie);
+    throw new Error("No movies found😣");
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      done: false,
+      error: error.message,
+    });
+  }
+};
+
+export const findMovieId = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const movieId = await Movie.findById(id);
+    if (!movieId) {
+      return res.status(404).json({
+        done: false,
+        message: `Movie with id ${id} not found😶‍🌫️`,
+      });
+    }
+    return res.status(200).json({
+      done: true,
+      movieId,
+    });
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+export const UpdateMovie = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    Movie.findByIdAndUpdate(
+      id,
+      { $set: req.body },
+      { new: true },
+      function (err, result) {
+        if (err) {
+          return res.status(400).json({
+            update: false,
+            message: "Error al modificar los datos",
+          });
+        }
+        return res.status(200).json({
+          update: true,
+          data: result,
+        });
+      }
+    );
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+export const createMovie = async (req: Request, res: Response) => {
+  const {
+    title,
+    description,
+    adult,
+    rating,
+    popularity,
+    release,
+    poster_path,
+    poster_details,
+    genres,
+  } = req.body;
+
+  try {
+    const movie = await Movie.findOne({ title: title.trim() });
+    const errors = validationResult(req);
+    if (movie)
+      return res.status(400).json({
+        create: false,
+        message: `Exist a movie with title ${title}`,
+      });
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const createMovie = new Movie({
+      title,
+      description,
+      rating,
+      poster_path,
+      poster_details,
+      genres,
+      release,
+      popularity,
+      adult,
+    });
+
+    createMovie.save((err, result) => {
+      if (err)
+        res.status(400).json({
+          create: false,
+          message: "Error al crear la pélicula",
+        });
+      return res.status(201).json({
+        create: true,
+        movie: result,
+      });
+    });
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+export const deleteMovie = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const deleteMovieId = await Movie.findByIdAndDelete(id);
+
+    if (!deleteMovieId)
+      return res.status(404).json({
+        delete: false,
+        message: `No found movie with id ${id}`,
+      });
+    return res.status(200).json({
+      delete: true,
+      movie: deleteMovieId,
+    });
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+// Filtros
+
+export const filterByName = async (req: Request, res: Response) => {
+  const { name } = req.body;
+
+  try {
+    const oneMovie = await Movie.find({ title: { $in: [name.trim()] } });
+
+    if (!name)
+      return res.status(404).json({
+        done: false,
+        message: `Name is required for the consult`,
+      });
+
+    if (oneMovie.length !== 0) {
+      return res.status(200).json({
+        done: true,
+        movie: oneMovie,
+      });
+    }
+    return res.status(404).json({
+      done: false,
+      message: `No found movie ${name}`,
+    });
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+export const filterGenres = async (req: Request, res: Response) => {
+  const { genre } = req.body;
+  try {
+    const allGenres = await Movie.find({ genres: { $all: [genre.trim()] } });
+    if (!genre)
+      return res.status(404).json({
+        done: false,
+        Message: "The genre  is reuqried",
+      });
+    if (allGenres.length < 1)
+      return res.status(404).json({
+        done: false,
+        Message: `No found movie with genre ${genre}`,
+      });
+    return res.status(200).json({
+      done: true,
+      data: allGenres,
+    });
+  } catch (error) {
+    console.warn(error);
+  }
+};
+
+export const orderMovie = async (req: Request, res: Response) => {
+  const { number } = req.body;
+
+  try {
+    const movieSort = await Movie.find().sort({ title: number });
+    if (!number)
+      return res.status(404).json({
+        done: false,
+        Message: `Insert number, 1 ascending -1 descending`,
+      });
+    return res.status(200).json(movieSort);
+  } catch (error) {
+    console.warn(error);
+  }
+};
