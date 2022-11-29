@@ -69,6 +69,35 @@ export const loginUser = async (
   }
 };
 
+export const fortgotPassword = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { email, newPassword, repiteNewPassword } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) throw new Error(`No existe un usuario con email ${email}❌`);
+    if (!email || !newPassword || !repiteNewPassword)
+      throw new Error(`Faltan parametros obligatorios❌`);
+    if (newPassword.trim() !== repiteNewPassword.trim())
+      throw new Error(`Las password no coinciden❌`);
+    user.password = newPassword;
+    await user.save();
+
+    return res.status(200).json({
+      modicado: true,
+      user,
+    });
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      moficado: false,
+      error: error.message,
+    });
+  }
+};
+
 export const logoutUser = async () => {};
 
 export const allUsers = async (

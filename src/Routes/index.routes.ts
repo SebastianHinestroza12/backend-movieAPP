@@ -26,6 +26,7 @@ router.get("/orderMovie", movieController.orderMovie);
 // User
 
 router.get("/users", userController.allUsers);
+router.put("/forgotPassword", userController.fortgotPassword);
 router.post(
   "/register",
   Validator.userValidator(),
