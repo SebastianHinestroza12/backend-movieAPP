@@ -6,12 +6,14 @@ import session from "express-session";
 import cors from "cors";
 import "./Database/db";
 import "dotenv/config.js";
+import { strategy } from "./Controllers/auth.passport";
 const app = express();
 const PORT: number = 3001;
 const { SECRET_KEY } = process.env;
 
 // MiddlewareStack
 app.use(passport.initialize());
+passport.use(strategy);
 
 app.use(
   session({

@@ -18,8 +18,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   token?: boolean;
-  confirmAccount?: boolean;
+  // confirmAccount?: boolean;
   avatar: string;
-  comparePassword(password: string): boolean;
+  comparePassword(password: string): Promise<boolean>;
   createToken(): string;
 }

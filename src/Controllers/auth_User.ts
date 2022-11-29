@@ -8,14 +8,15 @@ export const registerUser = async (req: Request, res: Response) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let { name, email, password, token } = req.body;
+  let { name, email, password, repitePassword } = req.body;
   try {
     let findUser = await User.findOne({ email });
     if (!name || !email || !password)
       throw new Error(`Faltan parametros obligatrios para el registro❌`);
     if (findUser) throw new Error(`Ya existe el usuario: ${email}`);
-
-    const addUser = new User({ name, email, password, token });
+    if (password.trim() !== repitePassword.trim())
+      throw new Error(`Las password no coinciden❌`);
+    const addUser = new User({ name, email, password });
     addUser.save((err, result) => {
       if (err) throw new Error(`Error al registrar al usuario`);
       return res.status(201).json({
@@ -32,7 +33,10 @@ export const registerUser = async (req: Request, res: Response) => {
   }
 };
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -58,40 +62,35 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   } catch (e) {
     let error = <Error>e;
-    return res.status(404).json({
+    return res.status(400).json({
       login: false,
       error: error.message,
     });
   }
 };
 
-export const confirmAccount = async (req: Request, res: Response) => {
-  const { token } = req.params;
-  try {
-    const user = await User.findOne({ token });
-    if (!user) throw new Error(`No existe este usuario`);
-    user.confirmAccount = true;
-    user.token = false;
-    await user.save();
-    return res.status(200).json({
-      done: true,
-      token,
-    });
-  } catch (e) {
-    let error = <Error>e;
-    return res.status(404).json({
-      confirm: false,
-      error: error.message,
-    });
-  }
-};
+export const logoutUser = async () => {};
 
-export const allUsers = async (req: Request, res: Response) => {
+export const allUsers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const user = await User.find();
     if (!(user.length !== 0))
       throw new Error(`No tenemos usuarios registrados❌`);
     return res.status(200).json(user);
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      error: error.message,
+    });
+  }
+};
+
+export const rutaProtegida = async (req: Request, res: Response) => {
+  try {
+    return res.status(200).json("access");
   } catch (e) {
     let error = <Error>e;
     return res.status(404).json({

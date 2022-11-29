@@ -3,6 +3,7 @@ const router = express.Router();
 import * as movieController from "../Controllers/auth_movies";
 import * as userController from "../Controllers/auth_User";
 import * as Validator from "../Middlewares/validatorMovie";
+import passport from "passport";
 
 // Movies
 router.get("/movies", movieController.getAllMovies);
@@ -31,8 +32,13 @@ router.post(
   userController.registerUser
 );
 router.post("/login", Validator.loginValidator(), userController.loginUser);
-router.get("/confirmAccount/:token", userController.confirmAccount);
+// router.get("/confirmAccount/:token", userController.confirmAccount);
 
 // SESSION
+router.get(
+  "/rutaProtegida",
+  passport.authenticate("jwt", { session: false }),
+  userController.rutaProtegida
+);
 
 export { router };

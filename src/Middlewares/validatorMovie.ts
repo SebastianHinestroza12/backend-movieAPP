@@ -98,6 +98,13 @@ export const userValidator = () => {
       .escape()
       .isLength({ min: 6 })
       .withMessage("La password de tener como minimo 6 caracteres"),
+    body("repitePassword")
+      .trim()
+      .notEmpty()
+      .withMessage("repitePassword es obligatorio")
+      .escape()
+      .isLength({ min: 6 })
+      .withMessage("La password de tener como minimo 6 caracteres"),
   ];
   return validatorUser;
 };

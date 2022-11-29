@@ -23,26 +23,19 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
   },
-  token: {
-    type: String,
-    default: null,
-  },
-  confirmAccount: {
-    type: Boolean,
-    default: false,
-  },
   avatar: {
     type: String,
     default: null,
   },
 });
 
+/* Este es un middleware que se ejecuta antes de que el usuario se guarde en la base de datos. */
 userSchema.pre("save", async function (next) {
   const user = this;
   if (!user.isModified("password")) return next();
 
   try {
-    // generate a salt
+    /* Generando un salt para la contraseña. */
     const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
     const hash = await bcrypt.hash(user.password, salt);
     user.password = hash;
@@ -53,16 +46,22 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-userSchema.methods.comparePassword = async function (password: string) {
+/* Este método se utiliza para comparar la contraseña que envía el usuario con la contraseña que está
+almacenada en la base de datos. */
+userSchema.methods.comparePassword = async function (
+  password: string
+): Promise<boolean> {
   return await bcrypt.compare(password, this.password);
 };
 
+/* Crear un token para el usuario. */
 userSchema.methods.createToken = function () {
   const user = this;
   return jwt.sign(
     { id: user.id, email: user.email },
     `${process.env.JWT_SECRET_KEY}`,
-    { expiresIn: 8432 }
+    { expiresIn: "1d" }
   );
 };
+
 export default mongoose.model("User", userSchema);

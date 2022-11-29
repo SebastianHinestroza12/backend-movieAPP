@@ -2,7 +2,12 @@ import { validationResult } from "express-validator";
 import { Response, Request } from "express";
 import Movie from "../Model/Movie";
 
-export const getAllMovies = async (req: Request, res: Response) => {
+// Obtiene todas las películas de la base de datos y las devuelve en la respuesta.
+
+export const getAllMovies = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const allMovie = await Movie.find();
     if (allMovie.length > 0) return res.status(200).json(allMovie);
@@ -16,7 +21,10 @@ export const getAllMovies = async (req: Request, res: Response) => {
   }
 };
 
-export const findMovieId = async (req: Request, res: Response) => {
+export const findMovieId = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { id } = req.params;
   try {
     const movieId = await Movie.findById(id);
@@ -112,7 +120,10 @@ export const createMovie = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteMovie = async (req: Request, res: Response) => {
+export const deleteMovie = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { id } = req.params;
 
   try {
@@ -134,7 +145,10 @@ export const deleteMovie = async (req: Request, res: Response) => {
 
 // Filtros
 
-export const filterByName = async (req: Request, res: Response) => {
+export const filterByName = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { name } = req.body;
 
   try {
@@ -157,7 +171,10 @@ export const filterByName = async (req: Request, res: Response) => {
   }
 };
 
-export const filterGenres = async (req: Request, res: Response) => {
+export const filterGenres = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { genre } = req.body;
   try {
     const allGenres = await Movie.find({ genres: { $all: [genre.trim()] } });
@@ -177,7 +194,10 @@ export const filterGenres = async (req: Request, res: Response) => {
   }
 };
 
-export const orderMovie = async (req: Request, res: Response) => {
+export const orderMovie = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   const { number } = req.body;
   try {
     const movieSort = await Movie.find().sort({ title: number });
