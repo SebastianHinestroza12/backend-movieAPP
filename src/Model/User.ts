@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { IUser } from "../Interface/index";
 const bcrypt = require("bcryptjs");
 const { Schema } = mongoose;
+const SALT_WORK_FACTOR: number = 10;
 
 const userSchema = new Schema<IUser>({
   name: {
@@ -20,11 +21,11 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: true,
   },
-  tokenConfirm: {
+  token: {
     type: String,
     default: null,
   },
-  cuentaConfirmada: {
+  confirmAccount: {
     type: Boolean,
     default: false,
   },
@@ -40,7 +41,7 @@ userSchema.pre("save", async function (next) {
 
   try {
     // generate a salt
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
     const hash = await bcrypt.hash(user.password, salt);
     user.password = hash;
     next();
@@ -49,4 +50,9 @@ userSchema.pre("save", async function (next) {
     throw new Error("Error al codificar la contraseña");
   }
 });
+
+userSchema.methods.comparePassword = async function (password: string) {
+  return await bcrypt.compare(password, this.password);
+};
+
 export default mongoose.model("User", userSchema);

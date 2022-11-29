@@ -24,5 +24,11 @@ router.get("/orderMovie", movieController.orderMovie);
 
 // User
 
-router.get("/register", Validator.userValidator(), userController.registerUser);
+router.post(
+  "/register",
+  Validator.userValidator(),
+  userController.registerUser
+);
+router.post("/login", Validator.loginValidator(), userController.loginUser);
+router.get("/confirmAccount/:token", userController.confirmAccount);
 export { router };

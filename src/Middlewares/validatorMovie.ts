@@ -96,7 +96,30 @@ export const userValidator = () => {
       .notEmpty()
       .withMessage("Password es obligatorio")
       .escape()
-      .isLength({ min: 6 }),
+      .isLength({ min: 6 })
+      .withMessage("La password de tener como minimo 6 caracteres"),
   ];
   return validatorUser;
+};
+
+export const loginValidator = () => {
+  const loginUser: ValidationChain[] = [
+    body("email")
+      .trim()
+      .notEmpty()
+      .withMessage("Email es obligatorio")
+      .isString()
+      .withMessage("debe ser un string")
+      .isEmail()
+      .withMessage("Debe ser formato email, ejmplo : example@example.com")
+      .normalizeEmail(),
+    body("password")
+      .trim()
+      .notEmpty()
+      .withMessage("Password es obligatorio")
+      .escape()
+      .isLength({ min: 6 })
+      .withMessage("La password de tener como minimo 6 caracteres"),
+  ];
+  return loginUser;
 };

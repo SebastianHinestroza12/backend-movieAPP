@@ -15,7 +15,8 @@ export interface IUser {
   name: string;
   email: string;
   password: string;
-  tokenConfirm?: boolean;
-  cuentaConfirmada?: boolean;
+  token?: boolean;
+  confirmAccount?: boolean;
   avatar: string;
+  comparePassword(password: string): boolean;
 }
