@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import { IUser } from "../Interface/index";
+import jwt from "jsonwebtoken";
+import "dotenv/config.js";
 const bcrypt = require("bcryptjs");
 const { Schema } = mongoose;
 const SALT_WORK_FACTOR: number = 10;
@@ -55,4 +57,12 @@ userSchema.methods.comparePassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
 
+userSchema.methods.createToken = function () {
+  const user = this;
+  return jwt.sign(
+    { id: user.id, email: user.email },
+    `${process.env.JWT_SECRET_KEY}`,
+    { expiresIn: 8432 }
+  );
+};
 export default mongoose.model("User", userSchema);

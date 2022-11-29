@@ -1,3 +1,5 @@
+import { Document } from "mongoose";
+
 export interface IMovie {
   title: string;
   description: string;
@@ -11,7 +13,7 @@ export interface IMovie {
   date?: Date;
 }
 
-export interface IUser {
+export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
@@ -19,4 +21,5 @@ export interface IUser {
   confirmAccount?: boolean;
   avatar: string;
   comparePassword(password: string): boolean;
+  createToken(): string;
 }

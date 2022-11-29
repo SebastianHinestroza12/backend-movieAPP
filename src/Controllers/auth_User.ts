@@ -8,10 +8,9 @@ export const registerUser = async (req: Request, res: Response) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { name, email, password, token } = req.body;
+  let { name, email, password, token } = req.body;
   try {
     let findUser = await User.findOne({ email });
-
     if (!name || !email || !password)
       throw new Error(`Faltan parametros obligatrios para el registro❌`);
     if (findUser) throw new Error(`Ya existe el usuario: ${email}`);
@@ -46,11 +45,16 @@ export const loginUser = async (req: Request, res: Response) => {
     if (!user) throw new Error(`No existe el usuario con email : ${email}`);
     if (!(await user.comparePassword(password)))
       throw new Error(`password o email incorrecto❌`);
-    if (!user.confirmAccount)
-      throw new Error(`Falta confirma la cuenta, verifique su correo`);
+    // if (!user.confirmAccount)
+    //   throw new Error(`Falta confirma la cuenta, verifique su correo`);
+    const token = user.createToken();
     return res.status(200).json({
       login: true,
+      user: {
+        user,
+      },
       message: `Bienvenido ${user.name}🟢!!`,
+      token,
     });
   } catch (e) {
     let error = <Error>e;

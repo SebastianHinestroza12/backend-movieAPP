@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import { router } from "./Routes/index.routes";
+import passport from "passport";
 import session from "express-session";
 import cors from "cors";
 import "./Database/db";
@@ -10,6 +11,8 @@ const PORT: number = 3001;
 const { SECRET_KEY } = process.env;
 
 // MiddlewareStack
+app.use(passport.initialize());
+
 app.use(
   session({
     secret: `${SECRET_KEY}`,
