@@ -1,12 +1,24 @@
 import express from "express";
 import morgan from "morgan";
 import { router } from "./Routes/index";
+import session from "express-session";
 import cors from "cors";
 import "./Database/db";
+import "dotenv/config.js";
 const app = express();
 const PORT: number = 3001;
+const { SECRET_KEY } = process.env;
 
 // MiddlewareStack
+app.use(
+  session({
+    secret: `${SECRET_KEY}`,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(morgan("dev"));

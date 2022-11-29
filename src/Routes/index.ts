@@ -32,4 +32,7 @@ router.post(
 );
 router.post("/login", Validator.loginValidator(), userController.loginUser);
 router.get("/confirmAccount/:token", userController.confirmAccount);
+
+// SESSION
+
 export { router };
