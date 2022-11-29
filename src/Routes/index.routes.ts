@@ -24,16 +24,19 @@ router.get("/genres", movieController.filterGenres);
 router.get("/orderMovie", movieController.orderMovie);
 
 // User
-
 router.get("/users", userController.allUsers);
-router.put("/forgotPassword", userController.fortgotPassword);
+router.put(
+  "/forgotPassword",
+  Validator.forgotValidator(),
+  userController.fortgotPassword
+);
 router.post(
   "/register",
   Validator.userValidator(),
   userController.registerUser
 );
 router.post("/login", Validator.loginValidator(), userController.loginUser);
-// router.get("/confirmAccount/:token", userController.confirmAccount);
+router.get("/logout", userController.logoutUser);
 
 // SESSION
 router.get(

@@ -12,9 +12,6 @@ const PORT: number = 3001;
 const { SECRET_KEY } = process.env;
 
 // MiddlewareStack
-app.use(passport.initialize());
-passport.use(strategy);
-
 app.use(
   session({
     secret: `${SECRET_KEY}`,
@@ -23,6 +20,10 @@ app.use(
     cookie: { secure: false },
   })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(strategy);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

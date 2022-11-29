@@ -130,3 +130,31 @@ export const loginValidator = () => {
   ];
   return loginUser;
 };
+export const forgotValidator = () => {
+  const loginUser: ValidationChain[] = [
+    body("email")
+      .trim()
+      .notEmpty()
+      .withMessage("Email es obligatorio")
+      .isString()
+      .withMessage("debe ser un string")
+      .isEmail()
+      .withMessage("Debe ser formato email, ejmplo : example@example.com")
+      .normalizeEmail(),
+    body("newPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("newPassword es obligatorio")
+      .escape()
+      .isLength({ min: 6 })
+      .withMessage("La password de tener como minimo 6 caracteres"),
+    body("repiteNewPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("repiteNeqPassword es obligatorio")
+      .escape()
+      .isLength({ min: 6 })
+      .withMessage("La password de tener como minimo 6 caracteres"),
+  ];
+  return loginUser;
+};

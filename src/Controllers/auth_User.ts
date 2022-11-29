@@ -1,5 +1,5 @@
 import { validationResult } from "express-validator";
-import { Response, Request } from "express";
+import { Response, Request, NextFunction } from "express";
 import User from "../Model/User";
 
 export const registerUser = async (req: Request, res: Response) => {
@@ -73,13 +73,16 @@ export const fortgotPassword = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { email, newPassword, repiteNewPassword } = req.body;
 
   try {
     const user = await User.findOne({ email });
     if (!user) throw new Error(`No existe un usuario con email ${email}❌`);
-    if (!email || !newPassword || !repiteNewPassword)
-      throw new Error(`Faltan parametros obligatorios❌`);
     if (newPassword.trim() !== repiteNewPassword.trim())
       throw new Error(`Las password no coinciden❌`);
     user.password = newPassword;
@@ -98,7 +101,25 @@ export const fortgotPassword = async (
   }
 };
 
-export const logoutUser = async () => {};
+export const logoutUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    req.logout(function (err) {
+      if (err) {
+        return next(err);
+      }
+      return res.status(200).json({
+        logout: true,
+        message: "Session cerrada",
+      });
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const allUsers = async (
   req: Request,
