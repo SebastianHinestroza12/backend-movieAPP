@@ -20,18 +20,17 @@ export const findMovieId = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const movieId = await Movie.findById(id);
-    if (!movieId) {
-      return res.status(404).json({
-        done: false,
-        message: `Movie with id ${id} not found😶‍🌫️`,
-      });
-    }
+    if (!movieId) throw new Error(`Movie with id ${id} not found😶‍🌫️`);
     return res.status(200).json({
       done: true,
       movieId,
     });
-  } catch (error) {
-    console.warn(error);
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      done: false,
+      error: error.message,
+    });
   }
 };
 
@@ -48,20 +47,19 @@ export const UpdateMovie = async (req: Request, res: Response) => {
       { $set: req.body },
       { new: true },
       function (err, result) {
-        if (err) {
-          return res.status(400).json({
-            update: false,
-            message: "Error al modificar los datos",
-          });
-        }
+        if (err) throw new Error("Error al modificar los datos");
         return res.status(200).json({
           update: true,
           data: result,
         });
       }
     );
-  } catch (error) {
-    console.warn(error);
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      update: false,
+      error: error.message,
+    });
   }
 };
 
@@ -81,14 +79,10 @@ export const createMovie = async (req: Request, res: Response) => {
   try {
     const movie = await Movie.findOne({ title: title.trim() });
     const errors = validationResult(req);
-    if (movie)
-      return res.status(400).json({
-        create: false,
-        message: `Exist a movie with title ${title}`,
-      });
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+    if (movie) throw new Error(`Exist a movie with title ${title}`);
 
     const createMovie = new Movie({
       title,
@@ -102,19 +96,19 @@ export const createMovie = async (req: Request, res: Response) => {
       adult,
     });
 
-    createMovie.save((err, result) => {
-      if (err)
-        res.status(400).json({
-          create: false,
-          message: "Error al crear la pélicula",
-        });
+    await createMovie.save((err, result) => {
+      if (err) throw new Error("Error al crear la pélicula");
       return res.status(201).json({
         create: true,
         movie: result,
       });
     });
-  } catch (error) {
-    console.warn(error);
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(400).json({
+      create: false,
+      error: error.message,
+    });
   }
 };
 
@@ -124,17 +118,17 @@ export const deleteMovie = async (req: Request, res: Response) => {
   try {
     const deleteMovieId = await Movie.findByIdAndDelete(id);
 
-    if (!deleteMovieId)
-      return res.status(404).json({
-        delete: false,
-        message: `No found movie with id ${id}`,
-      });
+    if (!deleteMovieId) throw new Error(`No found movie with id ${id}`);
     return res.status(200).json({
       delete: true,
       movie: deleteMovieId,
     });
-  } catch (error) {
-    console.warn(error);
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      delete: false,
+      error: error.message,
+    });
   }
 };
 
@@ -146,24 +140,20 @@ export const filterByName = async (req: Request, res: Response) => {
   try {
     const oneMovie = await Movie.find({ title: { $in: [name.trim()] } });
 
-    if (!name)
-      return res.status(404).json({
-        done: false,
-        message: `Name is required for the consult`,
-      });
-
+    if (!name) throw new Error(`Name is required for the consult`);
     if (oneMovie.length !== 0) {
       return res.status(200).json({
         done: true,
         movie: oneMovie,
       });
     }
+    throw new Error(`No found movie ${name}`);
+  } catch (e) {
+    let error = <Error>e;
     return res.status(404).json({
-      done: false,
-      message: `No found movie ${name}`,
+      create: false,
+      error: error.message,
     });
-  } catch (error) {
-    console.warn(error);
   }
 };
 
@@ -171,37 +161,33 @@ export const filterGenres = async (req: Request, res: Response) => {
   const { genre } = req.body;
   try {
     const allGenres = await Movie.find({ genres: { $all: [genre.trim()] } });
-    if (!genre)
-      return res.status(404).json({
-        done: false,
-        Message: "The genre  is reuqried",
-      });
+    if (!genre) throw new Error("The genre  is reuqried");
     if (allGenres.length < 1)
-      return res.status(404).json({
-        done: false,
-        Message: `No found movie with genre ${genre}`,
-      });
+      throw new Error(`No found movie with genre ${genre}`);
     return res.status(200).json({
       done: true,
       data: allGenres,
     });
-  } catch (error) {
-    console.warn(error);
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      create: false,
+      error: error.message,
+    });
   }
 };
 
 export const orderMovie = async (req: Request, res: Response) => {
   const { number } = req.body;
-
   try {
     const movieSort = await Movie.find().sort({ title: number });
-    if (!number)
-      return res.status(404).json({
-        done: false,
-        Message: `Insert number, 1 ascending -1 descending`,
-      });
+    if (!number) throw new Error(`Insert number, 1 ascending -1 descending`);
     return res.status(200).json(movieSort);
-  } catch (error) {
-    console.warn(error);
+  } catch (e) {
+    let error = <Error>e;
+    return res.status(404).json({
+      create: false,
+      error: error.message,
+    });
   }
 };
