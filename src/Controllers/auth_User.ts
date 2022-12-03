@@ -8,7 +8,7 @@ export const registerUser = async (req: Request, res: Response) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let { name, email, password, repitePassword } = req.body;
+  let { name, surname, email, password, repitePassword } = req.body;
   try {
     let findUser = await User.findOne({ email });
     if (!name || !email || !password)
@@ -16,7 +16,7 @@ export const registerUser = async (req: Request, res: Response) => {
     if (findUser) throw new Error(`Ya existe el usuario: ${email}`);
     if (password.trim() !== repitePassword.trim())
       throw new Error(`Las password no coinciden❌`);
-    const addUser = new User({ name, email, password });
+    const addUser = new User({ name, email, password, surname });
     addUser.save((err, result) => {
       if (err) throw new Error(`Error al registrar al usuario`);
       return res.status(201).json({

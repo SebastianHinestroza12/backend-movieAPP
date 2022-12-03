@@ -17,6 +17,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  surname: string;
   token?: boolean;
   // confirmAccount?: boolean;
   avatar: string;

@@ -91,6 +91,12 @@ export const userValidator = () => {
       .isEmail()
       .withMessage("Debe ser formato email, ejmplo : example@example.com")
       .normalizeEmail(),
+    body("surname")
+      .trim()
+      .notEmpty()
+      .withMessage("Suename es obligatorio")
+      .isString()
+      .withMessage("debe ser un string"),
     body("password")
       .trim()
       .notEmpty()

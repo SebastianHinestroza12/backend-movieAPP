@@ -12,6 +12,10 @@ const userSchema = new Schema<IUser>({
     lowercase: true,
     required: true,
   },
+  surname: {
+    type: String,
+    required: true,
+  },
   email: {
     type: String,
     lowercase: true,
